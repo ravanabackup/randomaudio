@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Audio Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #00FF00; /* Hacker green color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 2em;
+        }
+
+        audio {
+            width: 70%;
+            margin-top: 20px;
+            outline: none;
+            filter: brightness(85%) sepia(100%) hue-rotate(120deg) saturate(200%);
+        }
+
+        p {
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #03a9f4;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #00FF00;
+        }
+
+        .player-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .icon {
+            font-size: 24px;
+            margin-right: 5px;
+        }
+
+        input[type="file"] {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="datetime" style="font-size: 1.2em; margin-top: 10px;"></div>
+
+    <div class="player-container">
+        <h1>Office Audio Player</h1>
+        <audio id="audioPlayer" controls></audio>
+        <p id="currentAudioName">Current Audio: None</p>
+        <p id="audioCount">Current Audio URL Number: 0</p>
+        <input type="file" id="fileInput" accept=".txt, .mp3, .aac, .m4a, .wav, .ogg" multiple>
+        <button id="shuffleButton"><i class="icon fas fa-random"></i> Shuffle</button>
+        <button id="colorButton"><i class="icon fas fa-paint-brush"></i> Change Color</button>
+        <button id="goreButton"><i class="icon fas fa-paint-brush"></i> Gore</button>
+    </div>
+
+    <script>
+        function updateDateTime() {
+            const dateTimeElement = document.getElementById('datetime');
+            const options = { timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+            const currentDateTime = new Date().toLocaleString('en-US', options);
+            dateTimeElement.textContent = currentDateTime;
+        }
+
+        // Initial update
+        updateDateTime();
+
+        // Update time every second
+        setInterval(updateDateTime, 1000);
+
+        const audioPlayer = document.getElementById('audioPlayer');
+        const currentAudioName = document.getElementById('currentAudioName');
+        const audioCount = document.getElementById('audioCount');
+        const shuffleButton = document.getElementById('shuffleButton');
+        const colorButton = document.getElementById('colorButton');
+        const goreButton = document.getElementById('goreButton');
+        const fileInput = document.getElementById('fileInput');
+
+        let audioList = [];
+        let currentAudioIndex = -1;
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            audioList = [];
+            const filePromises = Array.from(files).map(file => {
+                return new Promise((resolve, reject) => {
+                    if (file.type.startsWith('text/plain')) {
+                        // Handle .txt files
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            resolve(e.target.result.split('\n').filter(url => url.trim() !== ''));
+                        };
+                        reader.onerror = reject;
+                        reader.readAsText(file);
+                    } else if (file.type.startsWith('audio/')) {
+                        // Handle audio files
+                        const url = URL.createObjectURL(file);
+                        resolve([url]);
+                    } else {
+                        reject(new Error('Unsupported file type'));
+                    }
+                });
+            });
+
+            Promise.all(filePromises)
+                .then(results => {
+                    audioList = [].concat(...results); // Flatten the array of arrays
+                    playRandomAudio();
+                })
+                .catch(error => {
+                    console.error('Error reading files:', error);
+                });
+        }
+
+        function playRandomAudio() {
+            if (audioList.length === 0) return;
+
+            const randomIndex = Math.floor(Math.random() * audioList.length);
+
+            if (randomIndex !== currentAudioIndex) {
+                currentAudioIndex = randomIndex;
+            } else {
+                currentAudioIndex = (randomIndex + 1) % audioList.length;
+            }
+
+            const audioURL = audioList[currentAudioIndex];
+
+            if (audioURL) {
+                audioPlayer.src = audioURL;
+                const audioFileName = decodeURIComponent(audioURL.split('/').pop().split('.')[0]).replace(/%20/g, ' ');
+                currentAudioName.textContent = `Current Audio: ${audioFileName}`;
+                audioCount.textContent = `Current Audio URL Number: ${currentAudioIndex + 1}`;
+
+                audioPlayer.addEventListener('canplay', () => {
+                    audioPlayer.play();
+                });
+            }
+        }
+
+        shuffleButton.addEventListener('click', playRandomAudio);
+
+        colorButton.addEventListener('click', () => {
+            const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']; // Rainbow colors
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            document.body.style.backgroundColor = randomColor;
+            const textColor = getContrastColor(randomColor);
+            document.querySelectorAll('h1, p').forEach(element => {
+                element.style.color = textColor;
+            });
+            audioPlayer.style.backgroundColor = randomColor;
+            audioPlayer.style.color = textColor;
+        });
+
+        goreButton.addEventListener('click', () => {
+            const allColors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']; // Rainbow colors
+            audioPlayer.style.backgroundColor = "#121212";
+            audioPlayer.style.color = "#00FF00";
+            document.querySelectorAll('h1, p').forEach(element => {
+                const words = element.textContent.split(' ');
+                element.innerHTML = words.map(word => {
+                    const randomColor = allColors[Math.floor(Math.random() * allColors.length)];
+                    const textColor = getContrastColor(randomColor);
+                    return `<span style="color: ${textColor}; background-color: ${randomColor};">${word}</span>`;
+                }).join(' ');
+            });
+        });
+
+        audioPlayer.addEventListener('ended', playRandomAudio);
+
+        // Function to get contrast color based on background color
+        function getContrastColor(color) {
+            // Convert hex color to RGB
+            const hexToRgb = hex =>
+                hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+                ,(m, r, g, b) => '#' + r + r + g + g + b + b)
+                   .substring(1).match(/.{2}/g)
+                   .map(x => parseInt(x, 16));
+
+            const rgb = hexToRgb(color);
+            const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+            return brightness > 125 ? '#000000' : '#ffffff';
+        }
+    </script>
+</body>
+</html>
