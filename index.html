@@ -172,6 +172,62 @@
         .dark-mode #previousAudios h2 {
             color: #00ffff;
         }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-top: 1rem;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            border-radius: 50%;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body class="light-mode">
@@ -182,7 +238,10 @@
         <p id="currentAudioName">Current Audio: None</p>
         <p id="audioCount">Current Audio URL Number: 0</p>
         <button id="shuffleButton"><i class="icon fas fa-random"></i> Shuffle</button>
-        <button id="toggleModeButton"><i class="icon fas fa-adjust"></i> Toggle Mode</button>
+        <label class="toggle-switch">
+            <input type="checkbox" id="toggleModeButton">
+            <span class="slider round"></span>
+        </label>
         
         <div id="previousAudios">
             <h2>Previously Played:</h2>
@@ -265,10 +324,14 @@
         shuffleButton.addEventListener('click', playRandomAudio);
         audioPlayer.addEventListener('ended', playRandomAudio);
 
-        toggleModeButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            document.body.classList.toggle('light-mode');
-            isDarkMode = !isDarkMode;
+        toggleModeButton.addEventListener('change', () => {
+            if (toggleModeButton.checked) {
+                document.body.classList.add('dark-mode');
+                document.body.classList.remove('light-mode');
+            } else {
+                document.body.classList.add('light-mode');
+                document.body.classList.remove('dark-mode');
+            }
         });
     </script>
 </body>
