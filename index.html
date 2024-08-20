@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Office Audio Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: color 0.3s;
+        }
+
+        #datetime {
+            font-size: 1em;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        #audioPlayer {
+            width: 100%;
+            margin-top: 1rem;
+            transition: filter 0.3s;
+        }
+
+        #currentAudioName, #audioCount {
+            margin: 0.5rem 0;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        #shuffleButton {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #shuffleButton:hover {
+            background-color: #0056b3;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon {
+            margin-right: 5px;
+        }
+
+        #previousAudios {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        #previousAudios h2 {
+            font-size: 1.2em;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        #previousList {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        #previousList li {
+            margin-bottom: 0.3rem;
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 123, 255, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            }
+        }
+
+        .container {
+            animation: glow 4s infinite;
+        }
+
+        /* Light Mode */
+        .light-mode {
+            background-color: #f0f0f0;
+            color: #333333;
+        }
+
+        .light-mode .container {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode h1 {
+            color: #007bff;
+        }
+
+        .light-mode #shuffleButton {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .light-mode #shuffleButton:hover {
+            background-color: #0056b3;
+        }
+
+        .light-mode #previousAudios h2 {
+            color: #007bff;
+        }
+
+        /* Dark Mode */
+        .dark-mode {
+            background-color: #121212;
+            color: #00ffff;
+        }
+
+        .dark-mode .container {
+            background: rgba(20, 20, 20, 0.8);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .dark-mode h1 {
+            color: #00ffff;
+        }
+
+        .dark-mode #shuffleButton {
+            background-color: #00ffff;
+            color: #121212;
+        }
+
+        .dark-mode #shuffleButton:hover {
+            background-color: #00bfff;
+        }
+
+        .dark-mode #previousAudios h2 {
+            color: #00ffff;
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="container">
+        <h1>Futuristic Audio Player</h1>
+        <div id="datetime"></div>
+        <audio id="audioPlayer" controls></audio>
+        <p id="currentAudioName">Current Audio: None</p>
+        <p id="audioCount">Current Audio URL Number: 0</p>
+        <button id="shuffleButton"><i class="icon fas fa-random"></i> Shuffle</button>
+        <button id="toggleModeButton"><i class="icon fas fa-adjust"></i> Toggle Mode</button>
+        
+        <div id="previousAudios">
+            <h2>Previously Played:</h2>
+            <ul id="previousList"></ul>
+        </div>
+    </div>
+
+    <script>
+        function updateDateTime() {
+            const dateTimeElement = document.getElementById('datetime');
+            const options = { timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+            const currentDateTime = new Date().toLocaleString('en-US', options);
+            dateTimeElement.textContent = `${currentDateTime}`;
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        const audioPlayer = document.getElementById('audioPlayer');
+        const currentAudioName = document.getElementById('currentAudioName');
+        const audioCount = document.getElementById('audioCount');
+        const shuffleButton = document.getElementById('shuffleButton');
+        const toggleModeButton = document.getElementById('toggleModeButton');
+        const audioListURL = 'https://rawgithubusercontent.deno.dev/ravanabackup/randomaudio/main/source.txt';
+
+        let audioList = [];
+        let currentAudioIndex = -1;
+        let lastPlayedAudios = [];
+        let isDarkMode = false;
+
+        function playRandomAudio() {
+            const randomIndex = Math.floor(Math.random() * audioList.length);
+
+            if (randomIndex !== currentAudioIndex) {
+                currentAudioIndex = randomIndex;
+            } else {
+                currentAudioIndex = (randomIndex + 1) % audioList.length;
+            }
+
+            const audioURL = audioList[currentAudioIndex];
+
+            if (audioURL) {
+                audioPlayer.src = audioURL;
+                const audioFileName = decodeURIComponent(audioURL.split('/').pop().split('.')[0]).replace(/%20/g, ' ');
+                currentAudioName.textContent = `Current Audio: ${audioFileName}`;
+                audioCount.textContent = `Current Audio URL Number: ${currentAudioIndex + 1}`;
+
+                if (lastPlayedAudios.length >= 5) {
+                    lastPlayedAudios.shift();
+                }
+                lastPlayedAudios.push(audioFileName);
+
+                updatePreviousList();
+
+                audioPlayer.addEventListener('canplay', () => {
+                    audioPlayer.play();
+                });
+            }
+        }
+
+        function updatePreviousList() {
+            const previousList = document.getElementById('previousList');
+            previousList.innerHTML = '';
+
+            lastPlayedAudios.forEach(audio => {
+                const listItem = document.createElement('li');
+                listItem.textContent = audio;
+                previousList.appendChild(listItem);
+            });
+        }
+
+        fetch(audioListURL)
+            .then(response => response.text())
+            .then(data => {
+                audioList = data.split('\n');
+                playRandomAudio();
+            })
+            .catch(error => console.error('Error fetching audio list:', error));
+
+        shuffleButton.addEventListener('click', playRandomAudio);
+        audioPlayer.addEventListener('ended', playRandomAudio);
+
+        toggleModeButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            document.body.classList.toggle('light-mode');
+            isDarkMode = !isDarkMode;
+        });
+    </script>
+</body>
+</html>
