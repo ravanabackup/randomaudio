@@ -51,9 +51,15 @@
             transition: filter 0.3s;
         }
 
+        #shuffleButton,
+        .toggle-switch input,
+        .slider {
+            background-color: inherit; /* Match background color */
+            border: 1px solid transparent; /* Remove border */
+        }
+
         #shuffleButton {
-            background-color: #007bff;
-            color: #ffffff;
+            color: inherit; /* Match text color */
             border: none;
             padding: 10px 20px;
             font-size: 1em;
@@ -67,8 +73,6 @@
         }
 
         #shuffleButton:hover {
-            background-color: #0056b3;
-            color: #ffffff;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
         }
 
@@ -121,7 +125,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: inherit; /* Match background color */
             transition: .4s;
             border-radius: 34px;
         }
@@ -134,12 +138,12 @@
             border-radius: 50%;
             left: 4px;
             bottom: 4px;
-            background-color: white;
+            background-color: inherit; /* Match background color */
             transition: .4s;
         }
 
         input:checked + .slider {
-            background-color: #007bff;
+            background-color: inherit; /* Match background color */
         }
 
         input:checked + .slider:before {
@@ -153,6 +157,33 @@
 
         .slider.round:before {
             border-radius: 50%;
+        }
+        
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        body.dark-mode .container {
+            background: rgba(34, 34, 34, 0.9);
+        }
+
+        body.dark-mode #shuffleButton {
+            background-color: inherit; /* Match background color */
+            color: #ffffff;
+        }
+
+        body.dark-mode #shuffleButton:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode #datetime,
+        body.dark-mode #currentAudioName,
+        body.dark-mode #audioCount,
+        body.dark-mode #previousAudios h2,
+        body.dark-mode #previousList li {
+            color: #ffffff;
         }
     </style>
 </head>
@@ -188,14 +219,14 @@
         function applyColorScheme() {
             const isDarkMode = document.body.classList.contains('dark-mode');
             const backgroundColor = getRandomColor();
-            const containerBgColor = isDarkMode ? 'rgba(20, 20, 20, 0.8)' : 'rgba(255, 255, 255, 0.9)';
+            const containerBgColor = isDarkMode ? 'rgba(34, 34, 34, 0.9)' : 'rgba(255, 255, 255, 0.9)';
             const textColor = isDarkMode ? '#ffffff' : '#000000';
 
             document.body.style.backgroundColor = backgroundColor;
             document.querySelector('.container').style.backgroundColor = containerBgColor;
             
             document.querySelector('h1').style.color = textColor;
-            document.querySelector('#shuffleButton').style.backgroundColor = getRandomColor();
+            document.querySelector('#shuffleButton').style.backgroundColor = backgroundColor;
             document.querySelector('#shuffleButton').style.color = textColor;
 
             // Ensure text is readable
@@ -205,6 +236,13 @@
             document.querySelector('#previousAudios h2').style.color = textColor;
             document.querySelectorAll('#previousList li').forEach(li => {
                 li.style.color = textColor;
+            });
+
+            // Apply background color to the toggle switch
+            const sliders = document.querySelectorAll('.slider');
+            sliders.forEach(slider => {
+                slider.style.backgroundColor = backgroundColor;
+                slider.querySelector(':before').style.backgroundColor = backgroundColor;
             });
         }
 
@@ -224,7 +262,7 @@
         const audioCount = document.getElementById('audioCount');
         const shuffleButton = document.getElementById('shuffleButton');
         const toggleModeButton = document.getElementById('toggleModeButton');
-        const audioListURL = 'https://rawgithubusercontent.deno.dev/ravanabackup/randomaudio/main/source.txt';
+        const audioListURL = 'https://raw.githubusercontent.com/ravanabackup/randomaudio/main/source.txt';
 
         let audioList = [];
         let currentAudioIndex = -1;
