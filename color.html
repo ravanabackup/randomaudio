@@ -6,209 +6,203 @@
     <title>MusiOffice</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            transition: background-color 0.3s, color 0.3s;
-        }
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
 
-        .container {
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            max-width: 600px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.9); /* Default light background */
-            transition: background 0.3s, box-shadow 0.3s;
-        }
+.container {
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.9); /* Default light background */
+    transition: background 0.3s, box-shadow 0.3s;
+}
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            transition: color 0.3s;
-        }
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    transition: color 0.3s;
+}
 
-        #datetime,
-        #currentAudioName,
-        #audioCount,
-        #shuffleButton,
-        #previousAudios h2,
-        #previousList li {
-            transition: color 0.3s;
-        }
+#datetime,
+#currentAudioName,
+#audioCount,
+#shuffleButton,
+#previousAudios h2,
+#previousList li {
+    transition: color 0.3s;
+}
 
-        .custom-audio-player {
-            display: flex;
-            align-items: center;
-            background: inherit; /* Match background color */
-            border-radius: 5px;
-            padding: 10px;
-            width: 100%;
-            margin-top: 1rem;
-        }
+.custom-audio-player {
+    display: flex;
+    align-items: center;
+    background: inherit; /* Match background color */
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+    margin-top: 1rem;
+}
 
-        .custom-audio-player button {
-            background: inherit; /* Match background color */
-            border: none;
-            color: inherit; /* Match text color */
-            cursor: pointer;
-            font-size: 1.5em;
-            margin: 0 5px;
-        }
+.custom-audio-player button {
+    background: inherit; /* Match background color */
+    border: none;
+    color: inherit; /* Match text color */
+    cursor: pointer;
+    font-size: 1.5em;
+    margin: 0 5px;
+}
 
-        .custom-audio-player input[type="range"] {
-            flex-grow: 1;
-            margin: 0 10px;
-            background: inherit; /* Match background color */
-            cursor: pointer;
-        }
+.custom-audio-player input[type="range"] {
+    flex-grow: 1;
+    margin: 0 10px;
+    background: inherit; /* Match background color */
+    cursor: pointer;
+}
 
-        #shuffleButton,
-        .toggle-switch input,
-        .slider {
-            background-color: inherit; /* Match background color */
-            border: 1px solid transparent; /* Remove border */
-        }
+#shuffleButton {
+    background-color: inherit; /* Match background color */
+    color: inherit; /* Match text color */
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 50px;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 
-        #shuffleButton {
-            color: inherit; /* Match text color */
-            border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 50px;
-            margin-top: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
+#shuffleButton:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
 
-        #shuffleButton:hover {
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        }
+.icon {
+    margin-right: 5px;
+}
 
-        .icon {
-            margin-right: 5px;
-        }
+#previousAudios {
+    margin-top: 2rem;
+    text-align: left;
+}
 
-        #previousAudios {
-            margin-top: 2rem;
-            text-align: left;
-        }
+#previousAudios h2 {
+    font-size: 1.2em;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s;
+}
 
-        #previousAudios h2 {
-            font-size: 1.2em;
-            margin-bottom: 0.5rem;
-            transition: color 0.3s;
-        }
+#previousList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
 
-        #previousList {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
+#previousList li {
+    margin-bottom: 0.3rem;
+}
 
-        #previousList li {
-            margin-bottom: 0.3rem;
-        }
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-top: 1rem;
+}
 
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-            margin-top: 1rem;
-        }
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
 
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.6); /* Blended color */
+    transition: .4s;
+    border-radius: 34px;
+}
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: inherit; /* Match background color */
-            transition: .4s;
-            border-radius: 34px;
-        }
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    border-radius: 50%;
+    left: 4px;
+    bottom: 4px;
+    background-color: rgba(255, 255, 255, 0.9); /* Blended color */
+    transition: .4s;
+}
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            border-radius: 50%;
-            left: 4px;
-            bottom: 4px;
-            background-color: inherit; /* Match background color */
-            transition: .4s;
-        }
+input:checked + .slider {
+    background-color: rgba(0, 123, 255, 0.6); /* Blended color for dark mode */
+}
 
-        input:checked + .slider {
-            background-color: inherit; /* Match background color */
-        }
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
 
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
 
-        /* Rounded sliders */
-        .slider.round {
-            border-radius: 34px;
-        }
+.slider.round:before {
+    border-radius: 50%;
+}
 
-        .slider.round:before {
-            border-radius: 50%;
-        }
-        
-        /* Dark mode styles */
-        body.dark-mode {
-            background-color: #121212;
-            color: #ffffff;
-        }
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
 
-        body.dark-mode .container {
-            background: rgba(34, 34, 34, 0.9);
-        }
+body.dark-mode .container {
+    background: rgba(34, 34, 34, 0.9);
+}
 
-        body.dark-mode .custom-audio-player {
-            background: rgba(34, 34, 34, 0.9);
-        }
+body.dark-mode .custom-audio-player {
+    background: rgba(34, 34, 34, 0.9);
+}
 
-        body.dark-mode #shuffleButton {
-            background-color: inherit; /* Match background color */
-            color: #ffffff;
-        }
+body.dark-mode #shuffleButton {
+    background-color: rgba(255, 255, 255, 0.3); /* Blended color */
+    color: #ffffff;
+}
 
-        body.dark-mode #shuffleButton:hover {
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        }
+body.dark-mode #shuffleButton:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
 
-        body.dark-mode #datetime,
-        body.dark-mode #currentAudioName,
-        body.dark-mode #audioCount,
-        body.dark-mode #previousAudios h2,
-        body.dark-mode #previousList li {
-            color: #ffffff;
-        }
+body.dark-mode #datetime,
+body.dark-mode #currentAudioName,
+body.dark-mode #audioCount,
+body.dark-mode #previousAudios h2,
+body.dark-mode #previousList li {
+    color: #ffffff;
+}
     </style>
 </head>
 <body class="light-mode">
