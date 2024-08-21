@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -229,143 +230,150 @@ body.dark-mode #previousList li {
     </div>
 
     <script>
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
         }
+        return color;
+    }
 
-        function applyColorScheme() {
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const backgroundColor = getRandomColor();
-            const containerBgColor = isDarkMode ? 'rgba(34, 34, 34, 0.9)' : 'rgba(255, 255, 255, 0.9)';
-            const textColor = isDarkMode ? '#ffffff' : '#000000';
+    function applyColorScheme() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const backgroundColor = getRandomColor();
+        const containerBgColor = isDarkMode ? 'rgba(34, 34, 34, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+        const textColor = isDarkMode ? '#ffffff' : '#000000';
 
-            document.body.style.backgroundColor = backgroundColor;
-            document.querySelector('.container').style.backgroundColor = containerBgColor;
-            
-            document.querySelector('h1').style.color = textColor;
-            document.querySelector('#shuffleButton').style.backgroundColor = backgroundColor;
-            document.querySelector('#shuffleButton').style.color = textColor;
+        document.body.style.backgroundColor = backgroundColor;
+        document.querySelector('.container').style.backgroundColor = containerBgColor;
+        
+        document.querySelector('h1').style.color = textColor;
+        document.querySelector('#shuffleButton').style.backgroundColor = backgroundColor;
+        document.querySelector('#shuffleButton').style.color = textColor;
 
-            // Ensure text is readable
-            document.getElementById('datetime').style.color = textColor;
-            document.getElementById('currentAudioName').style.color = textColor;
-            document.getElementById('audioCount').style.color = textColor;
-            document.querySelector('#previousAudios h2').style.color = textColor;
-            document.querySelectorAll('#previousList li').forEach(li => {
-                li.style.color = textColor;
-            });
-
-            // Apply background color to the custom audio player
-            document.querySelector('.custom-audio-player').style.backgroundColor = backgroundColor;
-            document.querySelectorAll('.custom-audio-player button').forEach(button => {
-                button.style.color = textColor;
-            });
-            document.querySelector('#seekBar').style.backgroundColor = backgroundColor;
-        }
-
-        function updateDateTime() {
-            const dateTimeElement = document.getElementById('datetime');
-            const options = { timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
-            const currentDateTime = new Date().toLocaleString('en-US', options);
-            dateTimeElement.textContent = `${currentDateTime}`;
-        }
-
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-        setInterval(applyColorScheme, 5000); // Update colors every 5 seconds
-
-        const audioPlayer = new Audio(); // Using HTML Audio object directly
-        const playPauseButton = document.getElementById('playPauseButton');
-        const seekBar = document.getElementById('seekBar');
-        const nextButton = document.getElementById('nextButton');
-        const currentAudioName = document.getElementById('currentAudioName');
-        const audioCount = document.getElementById('audioCount');
-        const shuffleButton = document.getElementById('shuffleButton');
-        const toggleModeButton = document.getElementById('toggleModeButton');
-        const audioListURL = 'https://rawgithubusercontent.deno.dev/ravanabackup/randomaudio/main/source.txt';
-
-        let audioList = [];
-        let currentAudioIndex = -1;
-        let lastPlayedAudios = [];
-
-        function playRandomAudio() {
-            const randomIndex = Math.floor(Math.random() * audioList.length);
-
-            if (randomIndex !== currentAudioIndex) {
-                currentAudioIndex = randomIndex;
-            } else {
-                currentAudioIndex = (randomIndex + 1) % audioList.length;
-            }
-
-            const audioURL = audioList[currentAudioIndex];
-
-            if (audioURL) {
-                audioPlayer.src = audioURL;
-                const audioFileName = decodeURIComponent(audioURL.split('/').pop().split('.')[0]).replace(/%20/g, ' ');
-                currentAudioName.textContent = `Current Audio: ${audioFileName}`;
-                audioCount.textContent = `Current Audio URL Number: ${currentAudioIndex + 1}`;
-
-                if (lastPlayedAudios.length >= 5) {
-                    lastPlayedAudios.shift();
-                }
-                lastPlayedAudios.push(audioFileName);
-
-                updatePreviousList();
-
-                audioPlayer.play();
-            }
-        }
-
-        function updatePreviousList() {
-            const previousList = document.getElementById('previousList');
-            previousList.innerHTML = '';
-
-            lastPlayedAudios.forEach(audio => {
-                const listItem = document.createElement('li');
-                listItem.textContent = audio;
-                previousList.appendChild(listItem);
-            });
-        }
-
-        fetch(audioListURL)
-            .then(response => response.text())
-            .then(data => {
-                audioList = data.split('\n');
-                playRandomAudio();
-            })
-            .catch(error => console.error('Error fetching audio list:', error));
-
-        shuffleButton.addEventListener('click', playRandomAudio);
-        playPauseButton.addEventListener('click', () => {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                playPauseButton.innerHTML = '<i class="icon fas fa-pause"></i>';
-            } else {
-                audioPlayer.pause();
-                playPauseButton.innerHTML = '<i class="icon fas fa-play"></i>';
-            }
-        });
-        nextButton.addEventListener('click', playRandomAudio);
-
-        audioPlayer.addEventListener('ended', playRandomAudio);
-
-        toggleModeButton.addEventListener('change', () => {
-            if (toggleModeButton.checked) {
-                document.body.classList.add('dark-mode');
-                document.body.classList.remove('light-mode');
-            } else {
-                document.body.classList.add('light-mode');
-                document.body.classList.remove('dark-mode');
-            }
-            applyColorScheme(); // Apply colors when toggling mode
+        // Ensure text is readable
+        document.getElementById('datetime').style.color = textColor;
+        document.getElementById('currentAudioName').style.color = textColor;
+        document.getElementById('audioCount').style.color = textColor;
+        document.querySelector('#previousAudios h2').style.color = textColor;
+        document.querySelectorAll('#previousList li').forEach(li => {
+            li.style.color = textColor;
         });
 
-        applyColorScheme(); // Apply initial colors
+        // Apply background color to the custom audio player
+        document.querySelector('.custom-audio-player').style.backgroundColor = backgroundColor;
+        document.querySelectorAll('.custom-audio-player button').forEach(button => {
+            button.style.color = textColor;
+        });
+        document.querySelector('#seekBar').style.backgroundColor = backgroundColor;
+    }
+
+    function updateDateTime() {
+        const dateTimeElement = document.getElementById('datetime');
+        const options = { timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+        const currentDateTime = new Date().toLocaleString('en-US', options);
+        dateTimeElement.textContent = `${currentDateTime}`;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    const audioPlayer = new Audio(); // Using HTML Audio object directly
+    const playPauseButton = document.getElementById('playPauseButton');
+    const seekBar = document.getElementById('seekBar');
+    const nextButton = document.getElementById('nextButton');
+    const currentAudioName = document.getElementById('currentAudioName');
+    const audioCount = document.getElementById('audioCount');
+    const shuffleButton = document.getElementById('shuffleButton');
+    const toggleModeButton = document.getElementById('toggleModeButton');
+    const audioListURL = 'https://rawgithubusercontent.deno.dev/ravanabackup/randomaudio/main/source.txt';
+
+    let audioList = [];
+    let currentAudioIndex = -1;
+    let lastPlayedAudios = [];
+
+    function playRandomAudio() {
+        const randomIndex = Math.floor(Math.random() * audioList.length);
+
+        if (randomIndex !== currentAudioIndex) {
+            currentAudioIndex = randomIndex;
+        } else {
+            currentAudioIndex = (randomIndex + 1) % audioList.length;
+        }
+
+        const audioURL = audioList[currentAudioIndex];
+
+        if (audioURL) {
+            audioPlayer.src = audioURL;
+            const audioFileName = decodeURIComponent(audioURL.split('/').pop().split('.')[0]).replace(/%20/g, ' ');
+            currentAudioName.textContent = `Current Audio: ${audioFileName}`;
+            audioCount.textContent = `Current Audio URL Number: ${currentAudioIndex + 1}`;
+
+            if (lastPlayedAudios.length >= 5) {
+                lastPlayedAudios.shift();
+            }
+            lastPlayedAudios.push(audioFileName);
+
+            updatePreviousList();
+
+            audioPlayer.play();
+        }
+    }
+
+    function updatePreviousList() {
+        const previousList = document.getElementById('previousList');
+        previousList.innerHTML = '';
+
+        lastPlayedAudios.forEach(audio => {
+            const listItem = document.createElement('li');
+            listItem.textContent = audio;
+            previousList.appendChild(listItem);
+        });
+    }
+
+    fetch(audioListURL)
+        .then(response => response.text())
+        .then(data => {
+            audioList = data.split('\n');
+            playRandomAudio();
+        })
+        .catch(error => console.error('Error fetching audio list:', error));
+
+    shuffleButton.addEventListener('click', playRandomAudio);
+    playPauseButton.addEventListener('click', () => {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseButton.innerHTML = '<i class="icon fas fa-pause"></i>';
+        } else {
+            audioPlayer.pause();
+            playPauseButton.innerHTML = '<i class="icon fas fa-play"></i>';
+        }
+    });
+    nextButton.addEventListener('click', playRandomAudio);
+
+    audioPlayer.addEventListener('ended', playRandomAudio);
+
+    toggleModeButton.addEventListener('change', () => {
+        if (toggleModeButton.checked) {
+            document.body.classList.add('dark-mode');
+            document.body.classList.remove('light-mode');
+        } else {
+            document.body.classList.add('light-mode');
+            document.body.classList.remove('dark-mode');
+        }
+        applyColorScheme(); // Apply colors when toggling mode
+    });
+
+    // Apply initial colors
+    applyColorScheme();
+
+    // Change color scheme on 'C' or 'c' keypress
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'C' || event.key === 'c') {
+            applyColorScheme();
+        }
+    });
     </script>
 </body>
 </html>
