@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusiOffice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            transition: background 0.3s, box-shadow 0.3s, color 0.3s;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: color 0.3s;
+        }
+
+        #datetime,
+        #currentAudioName,
+        #audioCount,
+        #shuffleButton,
+        #refreshThemeButton,
+        #toggleDarkModeButton,
+        #previousAudios h2,
+        #previousList li {
+            transition: color 0.3s;
+        }
+
+        .custom-audio-player {
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .custom-audio-player button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+            margin: 0 5px;
+        }
+
+        .custom-audio-player input[type="range"] {
+            flex-grow: 1;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        #shuffleButton,
+        #refreshThemeButton,
+        #toggleDarkModeButton {
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #shuffleButton:hover,
+        #refreshThemeButton:hover,
+        #toggleDarkModeButton:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon {
+            margin-right: 5px;
+        }
+
+        #previousAudios {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        #previousAudios h2 {
+            font-size: 1.2em;
+            margin-bottom: 0.5rem;
+        }
+
+        #previousList {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        #previousList li {
+            margin-bottom: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MusiOffice</h1>
+        <div id="datetime"></div>
+        <div class="custom-audio-player">
+            <button id="playPauseButton"><i class="icon fas fa-play"></i></button>
+            <input type="range" id="seekBar" value="0" max="100">
+            <button id="nextButton"><i class="icon fas fa-forward"></i></button>
+        </div>
+        <p id="currentAudioName">Current Audio: None</p>
+        <p id="audioCount">Current Audio URL Number: 0</p>
+        <button id="shuffleButton"><i class="icon fas fa-random"></i> Shuffle</button>
+        <button id="refreshThemeButton"><i class="icon fas fa-palette"></i> Refresh Theme</button>
+        <button id="toggleDarkModeButton"><i class="icon fas fa-moon"></i> Toggle Dark Mode</button>
+        
+        <div id="previousAudios">
+            <h2>Previously Played:</h2>
+            <ul id="previousList"></ul>
+        </div>
+    </div>
+
+    <script>
+    let isDarkMode = false;
+
+    function getRandomColor() {
+        return `hsl(${Math.random() * 360}, ${Math.random() * 50 + 50}%, ${Math.random() * 30 + 35}%)`;
+    }
+
+    function getLuminance(color) {
+        const rgb = color.match(/\d+/g).map(Number);
+        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+    }
+
+    function getContrastColor(bgColor) {
+        return getLuminance(bgColor) > 0.5 ? '#000000' : '#ffffff';
+    }
+
+    function applyColorScheme() {
+        const backgroundColor = getRandomColor();
+        const textColor = getContrastColor(backgroundColor);
+        const containerBgColor = isDarkMode 
+            ? `hsla(${backgroundColor.match(/\d+/)[0]}, 50%, 10%, 0.9)`
+            : `hsla(${backgroundColor.match(/\d+/)[0]}, 50%, 90%, 0.9)`;
+        const buttonColor = `hsl(${backgroundColor.match(/\d+/)[0]}, 70%, ${isDarkMode ? 30 : 40}%)`;
+        const buttonTextColor = getContrastColor(buttonColor);
+
+        document.body.style.backgroundColor = backgroundColor;
+        document.body.style.color = textColor;
+        document.querySelector('.container').style.backgroundColor = containerBgColor;
+        document.querySelector('.container').style.color = isDarkMode ? '#ffffff' : '#000000';
+        
+        document.querySelector('h1').style.color = isDarkMode ? '#ffffff' : '#000000';
+        document.querySelectorAll('#shuffleButton, #refreshThemeButton, #toggleDarkModeButton').forEach(button => {
+            button.style.backgroundColor = buttonColor;
+            button.style.color = buttonTextColor;
+        });
+
+        document.querySelectorAll('#datetime, #currentAudioName, #audioCount, #previousAudios h2, #previousList li').forEach(el => {
+            el.style.color = isDarkMode ? '#ffffff' : '#000000';
+        });
+
+        document.querySelector('.custom-audio-player').style.backgroundColor = containerBgColor;
+        document.querySelectorAll('.custom-audio-player button').forEach(button => {
+            button.style.color = isDarkMode ? '#ffffff' : '#000000';
+        });
+        document.querySelector('#seekBar').style.backgroundColor = backgroundColor;
+    }
+
+    function toggleDarkMode() {
+        isDarkMode = !isDarkMode;
+        applyColorScheme();
+        document.getElementById('toggleDarkModeButton').innerHTML = 
+            `<i class="icon fas fa-${isDarkMode ? 'sun' : 'moon'}"></i> Toggle ${isDarkMode ? 'Light' : 'Dark'} Mode`;
+    }
+
+    function updateDateTime() {
+        const dateTimeElement = document.getElementById('datetime');
+        const options = { timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+        const currentDateTime = new Date().toLocaleString('en-US', options);
+        dateTimeElement.textContent = `${currentDateTime}`;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    const audioPlayer = new Audio();
+    const playPauseButton = document.getElementById('playPauseButton');
+    const seekBar = document.getElementById('seekBar');
+    const nextButton = document.getElementById('nextButton');
+    const currentAudioName = document.getElementById('currentAudioName');
+    const audioCount = document.getElementById('audioCount');
+    const shuffleButton = document.getElementById('shuffleButton');
+    const refreshThemeButton = document.getElementById('refreshThemeButton');
+    const toggleDarkModeButton = document.getElementById('toggleDarkModeButton');
+    const audioListURL = 'https://rawgithubusercontent.deno.dev/ravanabackup/randomaudio/main/source.txt';
+
+    let audioList = [];
+    let currentAudioIndex = -1;
+    let lastPlayedAudios = [];
+
+    function playRandomAudio() {
+        const randomIndex = Math.floor(Math.random() * audioList.length);
+
+        if (randomIndex !== currentAudioIndex) {
+            currentAudioIndex = randomIndex;
+        } else {
+            currentAudioIndex = (randomIndex + 1) % audioList.length;
+        }
+
+        const audioURL = audioList[currentAudioIndex];
+
+        if (audioURL) {
+            audioPlayer.src = audioURL;
+            const audioFileName = decodeURIComponent(audioURL.split('/').pop().split('.')[0]).replace(/%20/g, ' ');
+            currentAudioName.textContent = `Current Audio: ${audioFileName}`;
+            audioCount.textContent = `Current Audio URL Number: ${currentAudioIndex + 1}`;
+
+            if (lastPlayedAudios.length >= 5) {
+                lastPlayedAudios.shift();
+            }
+            lastPlayedAudios.push(audioFileName);
+
+            updatePreviousList();
+
+            audioPlayer.play();
+        }
+    }
+
+    function updatePreviousList() {
+        const previousList = document.getElementById('previousList');
+        previousList.innerHTML = '';
+
+        lastPlayedAudios.forEach(audio => {
+            const listItem = document.createElement('li');
+            listItem.textContent = audio;
+            previousList.appendChild(listItem);
+        });
+    }
+
+    fetch(audioListURL)
+        .then(response => response.text())
+        .then(data => {
+            audioList = data.split('\n');
+            playRandomAudio();
+        })
+        .catch(error => console.error('Error fetching audio list:', error));
+
+    shuffleButton.addEventListener('click', playRandomAudio);
+    playPauseButton.addEventListener('click', () => {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseButton.innerHTML = '<i class="icon fas fa-pause"></i>';
+        } else {
+            audioPlayer.pause();
+            playPauseButton.innerHTML = '<i class="icon fas fa-play"></i>';
+        }
+    });
+    nextButton.addEventListener('click', playRandomAudio);
+
+    audioPlayer.addEventListener('ended', playRandomAudio);
+
+    refreshThemeButton.addEventListener('click', applyColorScheme);
+    toggleDarkModeButton.addEventListener('click', toggleDarkMode);
+
+    // Apply initial colors
+    applyColorScheme();
+
+    // Change color scheme on 'C' or 'c' keypress
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'C' || event.key === 'c') {
+            applyColorScheme();
+        }
+    });
+    </script>
+</body>
+</html>
