@@ -68,22 +68,19 @@
             margin: 0 10px;
             cursor: pointer;
         }
-
         #shuffleButton,
         #refreshThemeButton,
         #toggleDarkModeButton {
-            border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 50px;
-            margin-top: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            margin-right: 10px;
         }
-
+        
         #shuffleButton:hover,
         #refreshThemeButton:hover,
         #toggleDarkModeButton:hover {
@@ -128,9 +125,9 @@
         </div>
         <p id="currentAudioName">Current Audio: None</p>
         <p id="audioCount">Current Audio URL Number: 0</p>
-        <button id="shuffleButton"><i class="icon fas fa-random"></i> Shuffle</button>
-        <button id="refreshThemeButton"><i class="icon fas fa-palette"></i> Refresh Theme</button>
-        <button id="toggleDarkModeButton"><i class="icon fas fa-moon"></i> Toggle Dark Mode</button>
+        <button id="shuffleButton"><i class="fas fa-random"></i></button>
+        <button id="refreshThemeButton"><i class="fas fa-palette"></i></button>
+        <button id="toggleDarkModeButton"><i class="fas fa-moon"></i></button>
         
         <div id="previousAudios">
             <h2>Previously Played:</h2>
@@ -186,10 +183,10 @@
     }
 
     function toggleDarkMode() {
-        isDarkMode = !isDarkMode;
-        applyColorScheme();
-        document.getElementById('toggleDarkModeButton').innerHTML = 
-            `<i class="icon fas fa-${isDarkMode ? 'sun' : 'moon'}"></i> Toggle ${isDarkMode ? 'Light' : 'Dark'} Mode`;
+    isDarkMode = !isDarkMode;
+    applyColorScheme();
+    document.querySelector('#toggleDarkModeButton i').className = 
+        `fas fa-${isDarkMode ? 'sun' : 'moon'}`;
     }
 
     function updateDateTime() {
