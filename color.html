@@ -38,6 +38,7 @@
         #datetime,
         #currentAudioName,
         #audioCount,
+        #audioDuration,
         #shuffleButton,
         #refreshThemeButton,
         #toggleDarkModeButton,
@@ -68,6 +69,7 @@
             margin: 0 10px;
             cursor: pointer;
         }
+
         #shuffleButton,
         #refreshThemeButton,
         #toggleDarkModeButton {
@@ -112,6 +114,12 @@
         #previousList li {
             margin-bottom: 0.3rem;
         }
+
+        #currentAudioName, #previousList li {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -123,6 +131,7 @@
             <input type="range" id="seekBar" value="0" max="100">
             <button id="nextButton"><i class="icon fas fa-forward"></i></button>
         </div>
+         <p id="audioDuration">Duration: 0:00 / 0:00</p>
         <p id="currentAudioName">Current Audio: None</p>
         <p id="audioCount">Current Audio URL Number: 0</p>
         <button id="shuffleButton"><i class="fas fa-random"></i></button>
@@ -171,7 +180,7 @@
             button.style.color = buttonTextColor;
         });
 
-        document.querySelectorAll('#datetime, #currentAudioName, #audioCount, #previousAudios h2, #previousList li').forEach(el => {
+        document.querySelectorAll('#datetime, #currentAudioName, #audioCount, #audioDuration, #previousAudios h2, #previousList li').forEach(el => {
             el.style.color = isDarkMode ? '#ffffff' : '#000000';
         });
 
@@ -183,10 +192,10 @@
     }
 
     function toggleDarkMode() {
-    isDarkMode = !isDarkMode;
-    applyColorScheme();
-    document.querySelector('#toggleDarkModeButton i').className = 
-        `fas fa-${isDarkMode ? 'sun' : 'moon'}`;
+        isDarkMode = !isDarkMode;
+        applyColorScheme();
+        document.querySelector('#toggleDarkModeButton i').className = 
+            `fas fa-${isDarkMode ? 'sun' : 'moon'}`;
     }
 
     function updateDateTime() {
@@ -205,6 +214,7 @@
     const nextButton = document.getElementById('nextButton');
     const currentAudioName = document.getElementById('currentAudioName');
     const audioCount = document.getElementById('audioCount');
+    const audioDuration = document.getElementById('audioDuration');
     const shuffleButton = document.getElementById('shuffleButton');
     const refreshThemeButton = document.getElementById('refreshThemeButton');
     const toggleDarkModeButton = document.getElementById('toggleDarkModeButton');
@@ -213,6 +223,19 @@
     let audioList = [];
     let currentAudioIndex = -1;
     let lastPlayedAudios = [];
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateAudioDuration() {
+        const currentTime = formatTime(audioPlayer.currentTime);
+        const totalTime = formatTime(audioPlayer.duration);
+        audioDuration.textContent = `Duration: ${currentTime} / ${totalTime}`;
+        seekBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    }
 
     function playRandomAudio() {
         const randomIndex = Math.floor(Math.random() * audioList.length);
@@ -227,7 +250,7 @@
 
         if (audioURL) {
             audioPlayer.src = audioURL;
-            const audioFileName = decodeURIComponent(audioURL.split('/').pop().split('.')[0]).replace(/%20/g, ' ');
+            const audioFileName = decodeURIComponent(audioURL.split('/').pop()).replace(/\.[^/.]+$/, "").replace(/%20/g, ' ');
             currentAudioName.textContent = `Current Audio: ${audioFileName}`;
             audioCount.textContent = `Current Audio URL Number: ${currentAudioIndex + 1}`;
 
@@ -239,6 +262,7 @@
             updatePreviousList();
 
             audioPlayer.play();
+            playPauseButton.innerHTML = '<i class="icon fas fa-pause"></i>';
         }
     }
 
@@ -274,6 +298,13 @@
     nextButton.addEventListener('click', playRandomAudio);
 
     audioPlayer.addEventListener('ended', playRandomAudio);
+    audioPlayer.addEventListener('timeupdate', updateAudioDuration);
+    audioPlayer.addEventListener('loadedmetadata', updateAudioDuration);
+
+    seekBar.addEventListener('input', () => {
+        const seekTime = audioPlayer.duration * (seekBar.value / 100);
+        audioPlayer.currentTime = seekTime;
+    });
 
     refreshThemeButton.addEventListener('click', applyColorScheme);
     toggleDarkModeButton.addEventListener('click', toggleDarkMode);
