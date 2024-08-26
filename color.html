@@ -42,6 +42,7 @@
         #shuffleButton,
         #refreshThemeButton,
         #toggleDarkModeButton,
+        #castButton,
         #previousAudios h2,
         #previousList li {
             transition: color 0.3s;
@@ -72,7 +73,8 @@
 
         #shuffleButton,
         #refreshThemeButton,
-        #toggleDarkModeButton {
+        #toggleDarkModeButton,
+        #castButton {
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -85,7 +87,8 @@
         
         #shuffleButton:hover,
         #refreshThemeButton:hover,
-        #toggleDarkModeButton:hover {
+        #toggleDarkModeButton:hover,
+        #castButton:hover {
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
         }
 
@@ -120,6 +123,18 @@
             overflow-wrap: break-word;
             max-width: 100%;
         }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .volume-control input[type="range"] {
+            flex-grow: 1;
+            margin: 0 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -131,12 +146,18 @@
             <input type="range" id="seekBar" value="0" max="100">
             <button id="nextButton"><i class="icon fas fa-forward"></i></button>
         </div>
-         <p id="audioDuration">Duration: 0:00 / 0:00</p>
+        <div class="volume-control">
+            <i class="fas fa-volume-down"></i>
+            <input type="range" id="volumeBar" min="0" max="1" step="0.1" value="1">
+            <i class="fas fa-volume-up"></i>
+        </div>
+        <p id="audioDuration">Duration: 0:00 / 0:00</p>
         <p id="currentAudioName">Current Audio: None</p>
         <p id="audioCount">Current Audio URL Number: 0</p>
         <button id="shuffleButton"><i class="fas fa-random"></i></button>
         <button id="refreshThemeButton"><i class="fas fa-palette"></i></button>
         <button id="toggleDarkModeButton"><i class="fas fa-moon"></i></button>
+        <button id="castButton"><i class="fas fa-cast"></i></button>
         
         <div id="previousAudios">
             <h2>Previously Played:</h2>
@@ -144,8 +165,10 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
     <script>
     let isDarkMode = false;
+    let castSession = null;
 
     function getRandomColor() {
         return `hsl(${Math.random() * 360}, ${Math.random() * 50 + 50}%, ${Math.random() * 30 + 35}%)`;
@@ -175,7 +198,7 @@
         document.querySelector('.container').style.color = isDarkMode ? '#ffffff' : '#000000';
         
         document.querySelector('h1').style.color = isDarkMode ? '#ffffff' : '#000000';
-        document.querySelectorAll('#shuffleButton, #refreshThemeButton, #toggleDarkModeButton').forEach(button => {
+        document.querySelectorAll('#shuffleButton, #refreshThemeButton, #toggleDarkModeButton, #castButton').forEach(button => {
             button.style.backgroundColor = buttonColor;
             button.style.color = buttonTextColor;
         });
@@ -218,6 +241,8 @@
     const shuffleButton = document.getElementById('shuffleButton');
     const refreshThemeButton = document.getElementById('refreshThemeButton');
     const toggleDarkModeButton = document.getElementById('toggleDarkModeButton');
+    const castButton = document.getElementById('castButton');
+    const volumeBar = document.getElementById('volumeBar');
     const audioListURL = 'https://rawgithubusercontent.deno.dev/ravanabackup/randomaudio/main/source.txt';
 
     let audioList = [];
@@ -235,6 +260,42 @@
         const totalTime = formatTime(audioPlayer.duration);
         audioDuration.textContent = `Duration: ${currentTime} / ${totalTime}`;
         seekBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    }
+
+    function initializeCastApi() {
+        cast.framework.CastContext.getInstance().setOptions({
+            receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+            autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+        });
+    }
+
+    function startCasting() {
+        const castContext = cast.framework.CastContext.getInstance();
+        castContext.requestSession().then(
+            function(session) {
+                castSession = session;
+                loadMediaOnCastDevice(audioPlayer.src);
+            },
+            function(error) {
+                console.error('Error starting cast session:', error);
+            }
+        );
+    }
+
+    function loadMediaOnCastDevice(mediaUrl) {
+        if (!castSession) return;
+
+        const mediaInfo = new chrome.cast.media.MediaInfo(mediaUrl, 'audio/mp3');
+        const request = new chrome.cast.media.LoadRequest(mediaInfo);
+
+        castSession.loadMedia(request).then(
+            function() {
+                console.log('Media loaded successfully');
+            },
+            function(error) {
+                console.error('Error loading media:', error);
+            }
+        );
     }
 
     function playRandomAudio() {
@@ -261,7 +322,11 @@
 
             updatePreviousList();
 
-            audioPlayer.play();
+            if (castSession) {
+                loadMediaOnCastDevice(audioURL);
+            } else {
+                audioPlayer.play();
+            }
             playPauseButton.innerHTML = '<i class="icon fas fa-pause"></i>';
         }
     }
@@ -308,6 +373,21 @@
 
     refreshThemeButton.addEventListener('click', applyColorScheme);
     toggleDarkModeButton.addEventListener('click', toggleDarkMode);
+    castButton.addEventListener('click', startCasting);
+
+    volumeBar.addEventListener('input', () => {
+        audioPlayer.volume = volumeBar.value;
+        if (castSession && castSession.media[0]) {
+            castSession.media[0].setVolume(volumeBar.value);
+        }
+    });
+
+    // Initialize Cast API
+    window['__onGCastApiAvailable'] = function(isAvailable) {
+        if (isAvailable) {
+            initializeCastApi();
+        }
+    };
 
     // Apply initial colors
     applyColorScheme();
